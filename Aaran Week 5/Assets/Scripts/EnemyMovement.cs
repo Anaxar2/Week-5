@@ -25,13 +25,7 @@ public class EnemyMovement : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (transform.position.y < lowerBound)
-        {
-            transform.position = new Vector3(0, 0, -10);
-
-        }
-
-        Vector3 lookDirection = (player.transform.position - transform.position).normalized;  // moves enemy to player baased on player position.
+       Vector3 lookDirection = (player.transform.position - transform.position).normalized;  // moves enemy to player baased on player position.
 
      rb.AddForce( lookDirection * speed);
     }

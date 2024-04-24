@@ -23,7 +23,7 @@ public class GameManager : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (currentTime < 0) currentTime += Time.deltaTime;
+        currentTime += Time.deltaTime;
 
         TimerText.text = "Timer:" + Mathf.RoundToInt(currentTime).ToString();
         LivesText.text = "Lives:" + Lives.ToString();
