@@ -14,6 +14,9 @@ public class GameManager : MonoBehaviour
     public int Lives;
     public TextMeshProUGUI LivesText;
 
+    [Header("Wave")]
+    public TextMeshProUGUI WaveNumbrerText;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -27,5 +30,6 @@ public class GameManager : MonoBehaviour
 
         TimerText.text = "Timer:" + Mathf.RoundToInt(currentTime).ToString();
         LivesText.text = "Lives:" + Lives.ToString();
+        WaveNumbrerText.text = "Wave:" + FindObjectOfType<SpawnManager>().waveNumber.ToString();
     }
 }

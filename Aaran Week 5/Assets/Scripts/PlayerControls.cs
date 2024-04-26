@@ -23,11 +23,13 @@ public class PlayerControls : MonoBehaviour
     public bool hasRepel;
     public bool hasJump;
     public float powerUpStrength;
-    public GameObject powerUpIndicator;
+    public GameObject repelIndicator;
+    public GameObject jumpIndicator;
 
     [Header ("Jump")]
     public float jumpForce;
     public float GravityMod;
+    bool isOnGround = true;
 
     private float timer = 5;
 
@@ -58,17 +60,28 @@ public class PlayerControls : MonoBehaviour
         {
             gm.Lives -= 1;
         }
-        // spawn walls on left mouse click
+        // spawn walls on Controller B Button.
         timer -= Time.deltaTime;
-        if (Input.GetKeyDown(KeyCode.B) && timer <= 0)
+        if (Input.GetAxis("Fire1")!=0 && timer <= 0)
         {
             Destroy(Instantiate(Wall, transform.position - FocalPoint.transform.forward, FocalPoint.transform.rotation), 3);
             timer = 1;
         }
-        //Power Up Indicator
+        //Power Up Indicator (Repel)
         {
-            powerUpIndicator.transform.position = transform.position + new Vector3(0, -0.5f, 0);
-            powerUpIndicator.SetActive(hasRepel);
+            repelIndicator.transform.position = transform.position + new Vector3(0, -0.5f, 0);
+            repelIndicator.SetActive(hasRepel);
+        }
+        // Power Up Indicator (Jump)
+        {
+            jumpIndicator.transform.position = transform.position + new Vector3(0, 1, 0);
+            jumpIndicator.SetActive(hasJump);
+        }
+        // jump with powerUp
+        if (Input.GetButtonDown("Jump") && hasJump && isOnGround == true)
+        {
+            rb.AddForce(Vector3.up * jumpForce, ForceMode.Impulse);
+            isOnGround = false;
         }
     }
     private void OnTriggerEnter(Collider other)
@@ -77,40 +90,40 @@ public class PlayerControls : MonoBehaviour
         {
          hasRepel = true; // makes has powerup true.
          Destroy(other.gameObject); // Destroys powerUp Icon after colliding with it.
-         powerUpIndicator.gameObject.SetActive(true);
-         StartCoroutine(PowerUpCoolDown());
+         repelIndicator.gameObject.SetActive(true);
+         StartCoroutine(RepelCoolDown());
         }
         if (other.CompareTag("Jump")) // checks if player has collided with object with tag PowerUp.
         {
          hasJump = true; // makes has powerup true.
          Destroy(other.gameObject); // Destroys powerUp Icon after colliding with it.
-         powerUpIndicator.gameObject.SetActive(true);
-         StartCoroutine(ShockWaveCoolDown());
-        }
-        if(Input.GetKeyDown(KeyCode.Space) && hasJump)
-        {//jump
-         rb.AddForce(Vector3.up * jumpForce, ForceMode.Impulse);
+         jumpIndicator.gameObject.SetActive(true);
+         StartCoroutine(JumpCoolDown());
         }
     }
     private void OnCollisionEnter(Collision collision)
     {
-        if (collision.gameObject.CompareTag("Enemy") &&hasRepel)
+        if (collision.gameObject.CompareTag("Enemy") && hasRepel)
         {
          Rigidbody enemyRb = collision.gameObject.GetComponent<Rigidbody>();
          Vector3 awayFromPlayer = (collision.gameObject.transform.position - transform.position);
          enemyRb.AddForce(awayFromPlayer * powerUpStrength, ForceMode.Impulse);
         }
+        if (collision.gameObject.CompareTag("Ground"))
+        {
+            isOnGround = true;
+        }
     }
-    IEnumerator PowerUpCoolDown()
+    IEnumerator RepelCoolDown()
     {
      yield return new WaitForSeconds(10);
-     powerUpIndicator.gameObject.SetActive(false);
+     repelIndicator.gameObject.SetActive(false);
      hasRepel = false;
     }
-    IEnumerator ShockWaveCoolDown()
+    IEnumerator JumpCoolDown()
     {
      yield return new WaitForSeconds(10);
-     powerUpIndicator.gameObject.SetActive(false);
+     jumpIndicator.gameObject.SetActive(false);
      hasJump = false;
     }
 
